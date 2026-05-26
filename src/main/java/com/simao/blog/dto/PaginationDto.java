@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-public class PostPaginationDto<T> {
+public class PaginationDto<T> {
     private List<T> data;
     private int currentPage;
     private int totalPages;

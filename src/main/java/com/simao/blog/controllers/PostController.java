@@ -1,6 +1,6 @@
 package com.simao.blog.controllers;
 
-import com.simao.blog.dto.PostPaginationDto;
+import com.simao.blog.dto.PaginationDto;
 import com.simao.blog.dto.PostRequestDto;
 import com.simao.blog.dto.PostResponseDto;
 import com.simao.blog.service.PostService;
@@ -26,8 +26,8 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<PostPaginationDto<PostResponseDto>> getAllPost(@RequestParam(name = "title", required = false) String title, Pageable p) {
-        PostPaginationDto<PostResponseDto> posts = title != null ? postService.findPostByTitle(title, p) : postService.getAll(p);
+    public ResponseEntity<PaginationDto<PostResponseDto>> getAllPost(@RequestParam(name = "title", required = false) String title, Pageable p) {
+        PaginationDto<PostResponseDto> posts = title != null ? postService.findPostByTitle(title, p) : postService.getAll(p);
         return ResponseEntity.status(HttpStatus.OK).body(posts);
     }
 

@@ -1,6 +1,6 @@
 package com.simao.blog.mapper;
 
-import com.simao.blog.dto.PostPaginationDto;
+import com.simao.blog.dto.PaginationDto;
 import com.simao.blog.dto.PostRequestDto;
 import com.simao.blog.dto.PostResponseDto;
 import com.simao.blog.model.Post;
@@ -25,8 +25,8 @@ public class PostMapper {
         );
     }
 
-    public static <T> PostPaginationDto<T> buildPaginatedResponse(Page<T> page) {
-        return new PostPaginationDto<>(
+    public static <T> PaginationDto<T> buildPaginatedResponse(Page<T> page) {
+        return new PaginationDto<>(
             page.getContent(),
             page.getNumber(),
             page.getTotalPages(),

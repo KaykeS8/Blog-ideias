@@ -1,6 +1,6 @@
 package com.simao.blog.service;
 
-import com.simao.blog.dto.PostPaginationDto;
+import com.simao.blog.dto.PaginationDto;
 import com.simao.blog.dto.PostRequestDto;
 import com.simao.blog.dto.PostResponseDto;
 import com.simao.blog.exceptions.PostNotFound;
@@ -19,7 +19,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -92,7 +91,7 @@ class PostServiceTest {
             when(postRepository.findAll(pageable)).thenReturn(paginaMock);
 
             // Act
-            PostPaginationDto<PostResponseDto> result = postService.getAll(pageable);
+            PaginationDto<PostResponseDto> result = postService.getAll(pageable);
 
             // Assert
             assertThat(result.getData()).hasSize(1);
@@ -111,7 +110,7 @@ class PostServiceTest {
             when(postRepository.findAll(pageable)).thenReturn(emptyPage);
 
             // Act
-            PostPaginationDto<PostResponseDto> result = postService.getAll(pageable);
+            PaginationDto<PostResponseDto> result = postService.getAll(pageable);
 
             // Assert
             assertThat(result.getData()).isEmpty();
@@ -148,6 +147,66 @@ class PostServiceTest {
             assertThatThrownBy(() -> postService.getPostById(0L))
                     .isInstanceOf(PostNotFound.class)
                     .hasMessageContaining("0");
+        }
+    }
+
+    @Nested
+    @DisplayName("UpdatePost()")
+    class UpdatePost {
+        @Test
+        @DisplayName("Should update title and content when both are provided")
+        void shouldUpdateTitleAndContent() {
+            // Arrange
+            PostRequestDto newData = new PostRequestDto("New title", "New content");
+            when(postRepository.findById(1L)).thenReturn(Optional.of(postSalvo));
+            when(postRepository.save(any(Post.class))).thenReturn(postSalvo);
+
+            // act
+            postService.updatePost(newData, 1L);
+
+            // Assert
+            assertThat(postSalvo.getTitle()).isEqualTo("New title");
+            assertThat(postSalvo.getContent()).isEqualTo("New content");
+        }
+
+        @Test
+        @DisplayName("Should throw exception when not found post by ID")
+        void shouldThrowExceptionWhenPostNotFoundById() {
+            // Arrange
+            when(postRepository.findById(0L)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> postService.updatePost(requestDto, 0L))
+                    .isInstanceOf(PostNotFound.class)
+                    .hasMessageContaining("0");
+        }
+    }
+
+    @Nested
+    @DisplayName("DeletePost()")
+    class DeletePost {
+
+        @Test
+        @DisplayName("Should delete post when ID exist")
+        void shouldDeletePostById() {
+            //Arrange
+            when(postRepository.existsById(1L)).thenReturn(true);
+
+            doNothing().when(postRepository).deleteById(1L);
+
+            postService.deletePost(1L);
+            verify(postRepository, times(1)).deleteById(1L);
+        }
+
+        @Test
+        @DisplayName("Should throw PostNotFound when try delete ID non-existent")
+        void shouldThrowExceptionWhenIdNonExist() {
+            when(postRepository.existsById(0L)).thenReturn(false);
+
+            assertThatThrownBy(() -> postService.deletePost(0L))
+                    .isInstanceOf(PostNotFound.class)
+                    .hasMessageContaining("0");
+
+            verify(postRepository, never()).deleteById(anyLong());
         }
     }
 }

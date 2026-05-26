@@ -1,6 +1,6 @@
 package com.simao.blog.service;
 
-import com.simao.blog.dto.PostPaginationDto;
+import com.simao.blog.dto.PaginationDto;
 import com.simao.blog.dto.PostRequestDto;
 import com.simao.blog.dto.PostResponseDto;
 import com.simao.blog.exceptions.PostNotFound;
@@ -29,13 +29,13 @@ public class PostService {
         return PostMapper.convertEntityToDtoResponse(post);
     }
 
-    public PostPaginationDto<PostResponseDto> getAll(Pageable p) {
+    public PaginationDto<PostResponseDto> getAll(Pageable p) {
         log.info("List all posts");
         Page<PostResponseDto> posts = postRepository.findAll(p).map(PostMapper::convertEntityToDtoResponse);
         return PostMapper.buildPaginatedResponse(posts);
     }
 
-    public PostPaginationDto<PostResponseDto> findPostByTitle(String title, Pageable p) {
+    public PaginationDto<PostResponseDto> findPostByTitle(String title, Pageable p) {
         log.info("Get post by title: {}", title);
         Page<PostResponseDto> posts = postRepository.findByTitleContainingIgnoreCase(title, p).map(PostMapper::convertEntityToDtoResponse);
         if (posts.getContent().isEmpty()) throw new PostNotFound("Post not found with title: " + title);
